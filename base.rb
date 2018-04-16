@@ -1,39 +1,66 @@
-require "selenium-webdriver"
-require "io/console"
+require 'selenium-webdriver'
+require 'io/console'
+require 'ruby-progressbar'
 
-unless Dir.exists?('./parrots')
+app_dir = File.expand_path(File.dirname(__FILE__))
+parrots_dir = app_dir + '/parrots/'
+
+unless Dir.exists?(parrots_dir)
   puts "First, lets download all the parrots!"
 
-  #!/usr/bin/env ruby
-  `wget -q http://cultofthepartyparrot.com/parrots-37c2756949.zip`
-  `unzip -q parrots-37c2756949.zip -d ./parrots/`
-  `rm -rf parrots-37c2756949`
+  `wget -q http://cultofthepartyparrot.com/parrots-37c2756949.zip -P #{app_dir}`
+  `unzip -q #{app_dir + '/parrots-37c2756949.zip'} -d #{parrots_dir}`
+  `cp -r #{parrots_dir + '/parrots'} #{app_dir} && rm -rf #{parrots_dir + '/parrots'} #{parrots_dir + '/hd'} `
+  `rm -f #{app_dir + '/parrots-37c2756949.zip'}`
 
-  puts "All set here, doctor!"
+  puts "All set here, doctor!\n\n"
 end
 
-puts "\n\nPlease, insert your organization slack url: (w/ https) "
-slack_path = gets.chomp
+puts "Please, insert your organization slack url:"
+print "https://"
+slack_path = "https://" + gets.chomp
 
-puts "\nInsert your user email"
+puts "\nInsert your user email:"
 slack_email = gets.chomp
 
 puts "\nNow insert your super secret password"
 slack_password = STDIN.noecho(&:gets).chomp
 
-puts "Now that we have it all, lets do this! :fast_parrot:"
+puts "\nNow that we have it all, lets do this! :fast_parrot:"
 
-driver = Selenium::WebDriver.for :chrome
-driver.navigate.to slack_path
+options = Selenium::WebDriver::Chrome::Options.new
+options.add_argument('--headless')
 
-driver.find_element(id: "email").send_keys(slack_email)
-driver.find_element(id: "password").send_keys(slack_password)
-driver.find_element(id: "signin_btn").click
+driver = Selenium::WebDriver.for :chrome, options: options
+driver.navigate.to slack_path + '/customize/emoji'
+
+driver.find_element(id: 'email').send_keys(slack_email)
+driver.find_element(id: 'password').send_keys(slack_password)
+driver.find_element(id: 'signin_btn').click
 
 begin
-  puts "\nWrong email/password mate, try again please" if driver.find_element(class: 'alert_error').displayed?
+  abort('\nWrong email/password mate, try again please') if driver.find_element(class: 'alert_error').displayed?
 rescue => NoSuchElementError
-  puts "\nLogin has been successfully made, are you feeling the parrots already?? "
+  puts "\nLogin has been successfully made, are you feeling the parrots already??\n\n"
 end
+
+parrots = Dir.children(parrots_dir)
+
+progress_bar = ProgressBar.create(title: 'Parroting your slack!', total: parrots.length, format: "\e[0;32m%t: |%B|\e[0m")
+
+parrots.each do |parrot_name|
+  progress_bar.title = parrot_name
+
+  input_el = driver.find_element(id: 'emojiimg')
+  driver.find_element(id: 'emojiname').send_keys(parrot_name.gsub(/.gif/, '').split(/(parrot)/).join('_'))
+  input_el.send_keys(parrots_dir + parrot_name)
+  input_el.submit
+
+  progress_bar.increment
+end
+
+`rm -rf #{parrots_dir}`
+
+puts "Now your slack is parroted, thanks for using this tool."
 
 driver.quit
