@@ -34,9 +34,11 @@ options.add_argument('--headless')
 driver = Selenium::WebDriver.for :chrome, options: options
 driver.navigate.to slack_path + '/customize/emoji'
 
+password_field = driver.find_element(id: 'password')
+
 driver.find_element(id: 'email').send_keys(slack_email)
-driver.find_element(id: 'password').send_keys(slack_password)
-driver.find_element(id: 'signin_btn').click
+password_field.send_keys(slack_password)
+password_field.submit
 
 begin
   abort('\nWrong email/password mate, try again please') if driver.find_element(class: 'alert_error').displayed?
