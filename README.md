@@ -8,7 +8,7 @@ Are you tired of having to install all the awesome party parrots emojis on your 
 - [Bundler](https://github.com/bundler/bundler)
 - wget
 - Terminal unzip
-- Chrome
+- Chrome && Chromedriver
 
 ## How do I use it?
 - bundle install
