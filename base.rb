@@ -32,6 +32,8 @@ options = Selenium::WebDriver::Chrome::Options.new
 options.add_argument('--headless')
 
 driver = Selenium::WebDriver.for :chrome, options: options
+wait = Selenium::WebDriver::Wait.new(timeout: 10)
+
 driver.navigate.to slack_path + '/customize/emoji'
 
 password_field = driver.find_element(id: 'password')
@@ -54,10 +56,11 @@ parrots_with_directory.each do |parrot_with_directory|
   parrot_name = parrot_with_directory.gsub(parrots_dir, '')
   progress_bar.title = parrot_name
 
-  input_el = driver.find_element(id: 'emojiimg')
-  driver.find_element(id: 'emojiname').send_keys(parrot_name.gsub(/.gif/, '').split(/(parrot)/).join('_'))
-  input_el.send_keys(parrots_dir + parrot_name)
-  input_el.submit
+  name_el = driver.find_element(id: 'emojiname')
+  name_el.clear()
+  name_el.send_keys(parrot_name.gsub(/.gif/, '').split(/(parrot)/).join('_'))
+  driver.find_element(id: 'emojiimg').send_keys(parrots_dir + parrot_name)
+  driver.find_element(id: 'addemoji_submit').click
 
   progress_bar.increment
 end
