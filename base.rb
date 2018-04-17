@@ -32,7 +32,6 @@ options = Selenium::WebDriver::Chrome::Options.new
 options.add_argument('--headless')
 
 driver = Selenium::WebDriver.for :chrome, options: options
-wait = Selenium::WebDriver::Wait.new(timeout: 10)
 
 driver.navigate.to slack_path + '/customize/emoji'
 
