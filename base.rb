@@ -46,11 +46,12 @@ rescue => NoSuchElementError
   puts "\nLogin has been successfully made, are you feeling the parrots already??\n\n"
 end
 
-parrots = Dir.children(parrots_dir)
+parrots_with_directory = Dir.glob(parrots_dir + '*.gif')
 
-progress_bar = ProgressBar.create(title: 'Parroting your slack!', total: parrots.length, format: "\e[0;32m%t: |%B|\e[0m")
+progress_bar = ProgressBar.create(title: 'Parroting your slack!', total: parrots_with_directory.length, format: "\e[0;32m%t: |%B|\e[0m")
 
-parrots.each do |parrot_name|
+parrots_with_directory.each do |parrot_with_directory|
+  parrot_name = parrot_with_directory.gsub(parrots_dir, '')
   progress_bar.title = parrot_name
 
   input_el = driver.find_element(id: 'emojiimg')
