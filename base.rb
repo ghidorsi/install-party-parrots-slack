@@ -33,6 +33,8 @@ options.add_argument('--headless')
 
 driver = Selenium::WebDriver.for :chrome, options: options
 
+wait = Selenium::WebDriver::Wait.new(:timeout => 15)
+
 driver.navigate.to slack_path + '/customize/emoji'
 
 password_field = driver.find_element(id: 'password')
@@ -51,15 +53,28 @@ parrots_with_directory = Dir.glob(parrots_dir + '*.gif')
 
 progress_bar = ProgressBar.create(title: 'Parroting your slack!', total: parrots_with_directory.length, format: "\e[0;32m%t: |%B|\e[0m")
 
+add_emoji_btn = wait.until {
+    element = driver.find_element(class: "p-customize_emoji_wrapper__custom_button")
+    element if element.displayed?
+  }
+
 parrots_with_directory.each do |parrot_with_directory|
   parrot_name = parrot_with_directory.gsub(parrots_dir, '')
   progress_bar.title = parrot_name
 
-  name_el = driver.find_element(id: 'emojiname')
+  add_emoji_btn.click
+
+  name_el = wait.until {
+    element = driver.find_element(id: 'emojiname')
+    element if element.displayed?
+  }
+  
   name_el.clear()
-  name_el.send_keys(parrot_name.gsub(/.gif/, '').split(/(parrot)/).join('_'))
-  driver.find_element(id: 'emojiimg').send_keys(parrots_dir + parrot_name)
-  driver.find_element(id: 'addemoji_submit').click
+  name_el.send_keys(parrot_name.gsub(/.gif/, '').split(/(?=parrot)/).join('_'))
+  driver.find_element(id: 'emojiimg').send_keys(parrots_dir + parrot_name)  
+  driver.find_element(class: 'c-dialog__go').click
+
+  sleep 2 # Wait image upload (this could take longer, change at your will)
 
   progress_bar.increment
 end
