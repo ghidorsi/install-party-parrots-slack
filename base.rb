@@ -8,13 +8,26 @@ parrots_dir = app_dir + '/parrots/'
 unless Dir.exists?(parrots_dir)
   puts "First, lets download all the parrots!"
 
-  `wget -q http://cultofthepartyparrot.com/parrots-37c2756949.zip -P #{app_dir}`
-  `unzip -q #{app_dir + '/parrots-37c2756949.zip'} -d #{parrots_dir}`
+  `wget -q http://cultofthepartyparrot.com/parrots-7ee809e0f0.zip -P #{app_dir}`
+  `unzip -q #{app_dir + '/parrots-7ee809e0f0.zip'} -d #{parrots_dir}`
   `cp -r #{parrots_dir + '/parrots'} #{app_dir} && rm -rf #{parrots_dir + '/parrots'} #{parrots_dir + '/hd'} `
-  `rm -f #{app_dir + '/parrots-37c2756949.zip'}`
+  `rm -f #{app_dir + '/parrots-7ee809e0f0.zip'}`
 
   puts "All set here, doctor!\n\n"
 end
+
+# parrots_dir = app_dir + '/guests/'
+
+# unless Dir.exists?(parrots_dir)
+#   puts "First, lets download all the guests!"
+
+#   `wget -q http://cultofthepartyparrot.com/guests-04afd6b426.zip -P #{app_dir}`
+#   `unzip -q #{app_dir + '/guests-04afd6b426.zip'} -d #{parrots_dir}`
+#   `cp -r #{parrots_dir + '/guests'} #{app_dir} && rm -rf #{parrots_dir + '/guests'} #{parrots_dir + '/hd'} `
+#   `rm -f #{app_dir + '/guests-04afd6b426.zip'}`
+
+#   puts "All set here, doctor!\n\n"
+# end
 
 puts "Please, insert your organization slack url:"
 print "https://"
@@ -31,7 +44,10 @@ puts "\nNow that we have it all, lets do this! :fast_parrot:"
 options = Selenium::WebDriver::Chrome::Options.new
 options.add_argument('--headless')
 
-driver = Selenium::WebDriver.for :chrome, options: options
+# w3c:false is required for Chrome 75+
+capabilities = { "chromeOptions" => {'w3c' => false} }
+
+driver = Selenium::WebDriver.for :chrome, options: options, desired_capabilities: capabilities
 
 wait = Selenium::WebDriver::Wait.new(:timeout => 15)
 
@@ -60,7 +76,14 @@ add_emoji_btn = wait.until {
 
 parrots_with_directory.each do |parrot_with_directory|
   parrot_name = parrot_with_directory.gsub(parrots_dir, '')
+  parrot_id = parrot_name.gsub(/.gif/, '').tr('-', '').split(/(?=parrot)/).join('-')
   progress_bar.title = parrot_name
+
+  # skip if the account already has this emoji
+  if driver.find_element(class: "p-customize_emoji_list__container").text.include?(":"+parrot_id+":")
+    progress_bar.increment
+    next
+  end
 
   add_emoji_btn.click
 
@@ -68,10 +91,10 @@ parrots_with_directory.each do |parrot_with_directory|
     element = driver.find_element(id: 'emojiname')
     element if element.displayed?
   }
-  
+
   name_el.clear()
-  name_el.send_keys(parrot_name.gsub(/.gif/, '').split(/(?=parrot)/).join('_'))
-  driver.find_element(id: 'emojiimg').send_keys(parrots_dir + parrot_name)  
+  name_el.send_keys(parrot_id)
+  driver.find_element(id: 'emojiimg').send_keys(parrots_dir + parrot_name)
   driver.find_element(class: 'c-dialog__go').click
 
   sleep 2 # Wait image upload (this could take longer, change at your will)
