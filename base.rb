@@ -16,19 +16,6 @@ unless Dir.exists?(parrots_dir)
   puts "All set here, doctor!\n\n"
 end
 
-# parrots_dir = app_dir + '/guests/'
-
-# unless Dir.exists?(parrots_dir)
-#   puts "First, lets download all the guests!"
-
-#   `wget -q http://cultofthepartyparrot.com/guests-04afd6b426.zip -P #{app_dir}`
-#   `unzip -q #{app_dir + '/guests-04afd6b426.zip'} -d #{parrots_dir}`
-#   `cp -r #{parrots_dir + '/guests'} #{app_dir} && rm -rf #{parrots_dir + '/guests'} #{parrots_dir + '/hd'} `
-#   `rm -f #{app_dir + '/guests-04afd6b426.zip'}`
-
-#   puts "All set here, doctor!\n\n"
-# end
-
 puts "Please, insert your organization slack url:"
 print "https://"
 slack_path = "https://" + gets.chomp
