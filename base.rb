@@ -37,7 +37,7 @@ capabilities = { "chromeOptions" => {'w3c' => false} }
 
 driver = Selenium::WebDriver.for :chrome, options: options, desired_capabilities: capabilities
 
-wait = Selenium::WebDriver::Wait.new(:timeout => 15)
+wait = Selenium::WebDriver::Wait.new(:timeout => 45)
 
 driver.navigate.to slack_path + '/customize/emoji'
 
@@ -77,7 +77,12 @@ parrots_with_directory.each do |parrot_with_directory|
   parrot_id = parrot_name.gsub(/.gif/, '').tr('-', '').split(/(?=parrot)/).join('-')
   progress_bar.title = parrot_name
 
-  add_emoji_btn_lambda.call.click
+  begin
+    add_emoji_btn_lambda.call.click
+  rescue => exception
+    sleep 3
+    add_emoji_btn_lambda.call.click
+  end
 
   name_el = wait.until {
     element = driver.find_element(id: 'emojiname')
