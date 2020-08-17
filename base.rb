@@ -66,7 +66,7 @@ add_emoji_btn_lambda.call
 
 parrots_with_directory.each do |parrot_with_directory|
   wait.until { 
-    if driver.find_elements(xpath: "//div[@data-qa='customize_emoji_add_dialog_error']").any?
+    if driver.find_elements(xpath: "//div[@data-qa='customize_emoji_add_dialog_error']").any? || driver.find_elements(id: 'emojiname_error').any?
       driver.find_element(xpath: "//button[@data-qa='sk_close_modal_button']").click
     end
 
@@ -77,12 +77,7 @@ parrots_with_directory.each do |parrot_with_directory|
   parrot_id = parrot_name.gsub(/.gif/, '').tr('-', '').split(/(?=parrot)/).join('-')
   progress_bar.title = parrot_name
 
-  begin
-    add_emoji_btn_lambda.call.click
-  rescue => exception
-    sleep 3
-    add_emoji_btn_lambda.call.click
-  end
+  add_emoji_btn_lambda.call.click
 
   name_el = wait.until {
     element = driver.find_element(id: 'emojiname')
@@ -92,7 +87,12 @@ parrots_with_directory.each do |parrot_with_directory|
   name_el.clear()
   name_el.send_keys(parrot_id)
   driver.find_element(id: 'emojiimg').send_keys(parrots_dir + parrot_name)
-  driver.find_element(xpath: "//button[@data-qa='customize_emoji_add_dialog_go']").click
+
+  begin
+    driver.find_element(xpath: "//button[@data-qa='customize_emoji_add_dialog_go']").click    
+  rescue => exception
+    # no action is needed, the emoji is already present and the button is not available to be clicked.
+  end
 
   progress_bar.increment
 end
