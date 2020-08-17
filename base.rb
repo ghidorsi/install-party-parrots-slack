@@ -91,7 +91,8 @@ parrots_with_directory.each do |parrot_with_directory|
   begin
     driver.find_element(xpath: "//button[@data-qa='customize_emoji_add_dialog_go']").click    
   rescue => exception
-    # no action is needed, the emoji is already present and the button is not available to be clicked.
+    sleep 2
+    driver.find_element(xpath: "//button[@data-qa='customize_emoji_add_dialog_go']").click
   end
 
   progress_bar.increment
