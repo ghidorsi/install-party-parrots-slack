@@ -9,17 +9,17 @@ parrots_dir = app_dir + '/parrots/'
 unless Dir.exists?(parrots_dir)
   puts "First, lets download all the parrots!"
 
-  `wget -q https://cultofthepartyparrot.com/parrots-fc0dac9ef3.zip -P #{app_dir}`
-  `unzip -q #{app_dir + '/parrots-fc0dac9ef3.zip'} -d #{app_dir}`
+  `wget -q https://cultofthepartyparrot.com/parrots-59b0d0e630.zip -P #{app_dir}`
+  `unzip -q #{app_dir + '/parrots-59b0d0e630.zip'} -d #{app_dir}`
   `cp -r #{parrots_dir + '/hd/.'} #{parrots_dir} && rm -rf #{parrots_dir + '/hd'}`
-  `rm -f #{app_dir + '/parrots-fc0dac9ef3.zip'}`
+  `rm -f #{app_dir + '/parrots-59b0d0e630.zip'}`
 
   puts "All set here, doctor!\n\n"
 end
 
 puts "Please, insert your organization slack url:"
 print "https://"
-slack_path = 'https://' + gets.chomp
+slack_path = 'https://' # + gets.chomp
 
 puts "\nInsert your user email:"
 slack_email = gets.chomp
@@ -30,7 +30,6 @@ slack_password = IO::console.getpass
 puts "\nNow that we have it all, lets do this! :fast_parrot:"
 
 options = Selenium::WebDriver::Chrome::Options.new
-options.add_argument('--headless')
 
 # w3c:false is required for Chrome 75+
 capabilities = { "chromeOptions" => {'w3c' => false} }
