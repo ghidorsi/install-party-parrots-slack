@@ -9,17 +9,17 @@ parrots_dir = app_dir + '/parrots/'
 unless Dir.exists?(parrots_dir)
   puts "First, lets download all the parrots!"
 
-  `wget -q https://cultofthepartyparrot.com/parrots-59b0d0e630.zip -P #{app_dir}`
-  `unzip -q #{app_dir + '/parrots-59b0d0e630.zip'} -d #{app_dir}`
+  `wget -q https://cultofthepartyparrot.com/parrots-8e0feb74a9.zip -P #{app_dir}`
+  `unzip -q #{app_dir + '/parrots-8e0feb74a9.zip'} -d #{app_dir}`
   `cp -r #{parrots_dir + '/hd/.'} #{parrots_dir} && rm -rf #{parrots_dir + '/hd'}`
-  `rm -f #{app_dir + '/parrots-59b0d0e630.zip'}`
+  `rm -f #{app_dir + '/parrots-8e0feb74a9.zip'}`
 
   puts "All set here, doctor!\n\n"
 end
 
 puts "Please, insert your organization slack url:"
 print "https://"
-slack_path = 'https://' # + gets.chomp
+slack_path = 'https://'  + gets.chomp
 
 puts "\nInsert your user email:"
 slack_email = gets.chomp
